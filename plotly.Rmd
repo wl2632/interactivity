@@ -69,5 +69,3 @@ scatter_ggplot = airbnb_data %>%
 
 ggplotly(scatter_ggplot)
 ```
-
-###
