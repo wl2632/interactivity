@@ -1,24 +1,19 @@
 ---
-title: "plotly"
-author: "Weijie Liu"
-date: "November 7, 2017"
-output: html_document
+title: "Airbnb dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
 ---
 
-## Dataset
-
-```{r}
-
+```{r setup, include=FALSE}
+library(flexdashboard)
 library(tidyverse)
 library(janitor)
 library(stringr)
 library(forcats)
 library(viridis)
 library(plotly)
-```
-
-## Read and clean data
-```{r}
 set.seed(1)
 airbnb_data = read_csv("./data/nyc_airbnb.zip") %>%
   clean_names() %>%
@@ -27,46 +22,37 @@ airbnb_data = read_csv("./data/nyc_airbnb.zip") %>%
   filter(boro == "Manhattan",
          room_type == "Entire home/apt",
          price > 100 & price < 400)
+
 ```
 
-### Plotly Scatterplot
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Scatterplot
 
 ```{r}
 airbnb_data %>%
   mutate(haver_text = str_c("Price: $", price, '\nRating:', rating)) %>%
   plot_ly(x = ~longitude, y = ~latitude, color = ~price, text = ~haver_text, type = "scatter", mode = "marker", alpha = 0.5)
-
 ```
 
-### Plotly boxplot
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Boxplot
 
 ```{r}
 airbnb_data %>%
-  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>%
-  plot_ly(x = ~neighbourhood, y = ~price, color = ~neighbourhood, type = "box")
-
+  mutate(haver_text = str_c("Price: $", price, '\nRating:', rating)) %>%
+  plot_ly(x = ~longitude, y = ~latitude, color = ~price, text = ~haver_text, type = "scatter", mode = "marker", alpha = 0.5)
 ```
 
-### Plotly bar chart
+### Bar chart
+
 ```{r}
 airbnb_data %>%
   count(neighbourhood) %>%
   mutate(neighbourhood = fct_reorder(neighbourhood, n)) %>%
   plot_ly(x = ~neighbourhood, y = ~n, color = ~neighbourhood, type = "bar")
-
-
-
-```
-
-### ggplotly
-```{r}
-scatter_ggplot = airbnb_data %>%
-  ggplot(aes(x = longitude, y = latitude, color = price)) +
-  geom_point(alpha = 0.25) +
-  scale_color_viridis() +
-  coord_cartesian() +
-  theme_classic()
-
-ggplotly(scatter_ggplot)
 ```
 
